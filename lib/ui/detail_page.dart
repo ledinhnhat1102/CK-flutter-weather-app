@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import '../components/weather_item.dart';
 import '../constants.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:flutter/services.dart'; // Import thư viện để kiểm tra tệp
+import 'package:flutter/services.dart'; // kt neu tep rong
+import '../components/weather_item.dart';
 
 class DetailPage extends StatefulWidget {
   final String location;
@@ -18,7 +18,7 @@ class _DetailPageState extends State<DetailPage> {
   final Constants _constants = Constants();
   List<dynamic> forecast = [];
 
-  final String apiKey = 'fcf854c6189244e1a0033053250101'; // API Key
+  final String apiKey = 'fcf854c6189244e1a0033053250101';
   final String apiUrl = 'https://api.weatherapi.com/v1/forecast.json';
 
   @override
@@ -27,20 +27,21 @@ class _DetailPageState extends State<DetailPage> {
     fetchForecastData(widget.location);
   }
 
-  /// Hàm kiểm tra tệp và trả về biểu tượng mặc định nếu không tìm thấy
+  /// check icon, neu ko co icon thi ve mac dinh
   Future<String> getWeatherIcon(String condition) async {
     String iconPath = 'assets/${condition.toLowerCase().replaceAll(' ', '')}.png';
     try {
       await rootBundle.load(iconPath);
-      return iconPath; // Nếu tìm thấy tệp, trả về đường dẫn
+      return iconPath; // tim thay  duong dan
     } catch (e) {
-      return 'assets/default.png'; // Nếu không tìm thấy tệp, trả về biểu tượng mặc định
+      return 'assets/default.png'; // tra ve icon mac dinh
     }
   }
 
   Future<void> fetchForecastData(String location) async {
     try {
       final response = await http.get(Uri.parse('$apiUrl?key=$apiKey&q=$location&days=7'));
+      //vi du https://api.weatherapi.com/v1/forecast.json?key=fcf854c6189244e1a0033053250101&q=Hanoi&days=7
       final data = json.decode(response.body);
 
       setState(() {
@@ -55,7 +56,7 @@ class _DetailPageState extends State<DetailPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('${widget.location} - 7-Day Forecast'),
+        title: Text('${widget.location} - 7 ngày tới'),
         backgroundColor: _constants.primaryColor,
       ),
       body: Padding(
@@ -70,40 +71,17 @@ class _DetailPageState extends State<DetailPage> {
             final condition = day['day']['condition']['text'];
 
             return FutureBuilder<String>(
-              future: getWeatherIcon(condition), // Lấy biểu tượng
+              future: getWeatherIcon(condition), // icon
               builder: (context, snapshot) {
-                final icon = snapshot.data ?? 'assets/default.png'; // Biểu tượng mặc định nếu lỗi
+                final icon = snapshot.data ?? 'assets/default.png'; // ko co lay icoon mac dinh
 
-                return Container(
-                  margin: const EdgeInsets.only(bottom: 10),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: _constants.greyColor),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  padding: const EdgeInsets.all(8),
-                  child: Row(
-                    children: [
-                      // Cột hiển thị ngày và biểu tượng
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(date, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                          SizedBox(height: 5),
-                          Image.asset(icon, width: 50, height: 50),
-                        ],
-                      ),
-                      SizedBox(width: 20),
-                      // Cột hiển thị nhiệt độ và trạng thái
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Max Temp: $maxTemp°C', style: TextStyle(fontSize: 16)),
-                          Text('Min Temp: $minTemp°C', style: TextStyle(fontSize: 16)),
-                          Text(condition, style: TextStyle(fontSize: 16)),
-                        ],
-                      ),
-                    ],
-                  ),
+                // Sdung Weather de  hien thi du lieu
+                return WeatherItem(
+                  date: date,
+                  maxTemp: maxTemp,
+                  minTemp: minTemp,
+                  condition: condition,
+                  iconPath: icon,
                 );
               },
             );

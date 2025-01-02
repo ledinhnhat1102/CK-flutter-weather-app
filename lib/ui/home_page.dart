@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-import 'package:flutter/services.dart'; // Import thêm thư viện
+import 'package:flutter/services.dart'; // de set image default
 import 'detail_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -14,7 +14,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final TextEditingController _cityController = TextEditingController();
-  String location = 'Ha Noi';
+  String location = 'Quy Nhon';
   String weatherIcon = 'assets/default.png';
   int temperature = 0;
   String currentWeatherStatus = '';
@@ -22,7 +22,7 @@ class _HomePageState extends State<HomePage> {
   String currentDate = DateFormat('EEEE, d MMMM yyyy').format(DateTime.now());
   String currentTime = DateFormat('hh:mm a').format(DateTime.now());
 
-  String apiKey = 'fcf854c6189244e1a0033053250101'; // API Key
+  String apiKey = 'fcf854c6189244e1a0033053250101';
   String apiUrl = "https://api.weatherapi.com/v1/forecast.json";
 
   @override
@@ -37,13 +37,14 @@ class _HomePageState extends State<HomePage> {
       await rootBundle.load(iconPath);
       return iconPath;
     } catch (e) {
-      return 'assets/default.png'; // Biểu tượng mặc định nếu không tìm thấy
+      return 'assets/default.png'; // mac dinh neu icon ko tim thay
     }
   }
 
   Future<void> fetchWeatherData(String city) async {
     try {
       final response = await http.get(Uri.parse('$apiUrl?key=$apiKey&q=$city&days=1'));
+      //vi du https://api.weatherapi.com/v1/forecast.json?key=fcf854c6189244e1a0033053250101&q=Hanoi&days=1
       final data = json.decode(response.body);
 
       String iconPath = await getWeatherIcon(data['current']['condition']['text']);
@@ -96,10 +97,10 @@ class _HomePageState extends State<HomePage> {
                       context: context,
                       builder: (_) {
                         return AlertDialog(
-                          title: Text("Enter City"),
+                          title: Text("Nhập ví trí"),
                           content: TextField(
                             controller: _cityController,
-                            decoration: InputDecoration(hintText: 'Enter city name'),
+                            decoration: InputDecoration(hintText: 'Nhập tên thành phố'),
                           ),
                           actions: [
                             TextButton(
@@ -107,7 +108,7 @@ class _HomePageState extends State<HomePage> {
                                 fetchWeatherData(_cityController.text);
                                 Navigator.pop(context);
                               },
-                              child: Text("Search"),
+                              child: Text("Tìm kiếm"),
                             ),
                           ],
                         );
@@ -135,7 +136,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                 );
               },
-              child: Text('View Weather Details'),
+              child: Text('Thời tiết 7 ngày tới'),
             ),
             SizedBox(height: 20),
 
